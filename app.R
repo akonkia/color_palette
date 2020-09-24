@@ -17,8 +17,9 @@ data <- c(
     "https://www.artifiche.com/cms/upload/posters_extralarge/2850.jpg"
 )
 
+# Pick an example from the image dataset
 default <- sample(data,1)
-#The svg files are not properly rendered at the moment.
+
 # Define UI for application 
 
 ui <- fluidPage(
@@ -49,19 +50,24 @@ ui <- fluidPage(
 # Define server logic 
 server <- function(input, output, session) {
     
-    output$palette <- renderPlot({
+    # Ensure reproducibility
+    set.seed(123)
+    
+    datasetInput <- reactive({
         
-        # Ensure reproducibility
-        set.seed(123)
-        out <- get_colors(input$path) %>%
-            make_palette(input$slider)
-        print(out)
+        get_colors(input$path) %>%
+                   make_palette(input$slider)
+        
+    })
+    
+    output$palette <- renderPlot({
+
+        out <- datasetInput()
 
     })
     output$code <- renderPrint({
         
-        out <- get_colors(input$path) %>%
-            make_palette(input$slider)
+        out <- datasetInput()
         print(out)
         
     })
