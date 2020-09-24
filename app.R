@@ -19,7 +19,7 @@ data <- c(
 
 # Pick an example from the image dataset
 default <- sample(data,1)
-#The svg files are not properly rendered at the moment.
+
 # Define UI for application 
 
 ui <- fluidPage(
@@ -51,12 +51,11 @@ ui <- fluidPage(
 server <- function(input, output, session) {
     
     # Ensure reproducibility
-    set.seed(123)
-    
+    set.seed(123)    
     
     output$palette <- renderPlot({
 
-        out <- get_colors(input$path) %>%
+        get_colors(input$path) %>%
             make_palette(input$slider)
 
     })
