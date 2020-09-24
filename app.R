@@ -17,6 +17,8 @@ data <- c(
     "https://www.artifiche.com/cms/upload/posters_extralarge/2850.jpg"
 )
 
+default <- sample(data,1)
+#The svg files are not properly rendered at the moment.
 # Define UI for application 
 
 ui <- fluidPage(
@@ -25,13 +27,13 @@ ui <- fluidPage(
     br(),
     tags$h4(a(href="https://github.com/zumbov2/colorfindr", "Based on the colorfindr package")),
     br(),
-    a(href="https://twitter.com/AKonkolewska", "By"),
+    a(href="https://github.com/akonkia", "By"),
     br(),
 
     sidebarLayout(
         sidebarPanel(
             # a text input box
-            textInput(inputId = "path", label = "Paste image URL below:", value = "URL..."),
+            textInput(inputId = "path", label = "Paste image URL below:", value = default),
             #a slider to choose number of colors in the palette                                                        
             sliderInput("slider", label = "How many colors would you like?",min = 1, max = 10, value = 5)
         ),
@@ -46,85 +48,29 @@ ui <- fluidPage(
 
 # Define server logic 
 server <- function(input, output, session) {
-    default <- sample(data,1)
+    
     output$palette <- renderPlot({
         
         # Ensure reproducibility
         set.seed(123)
-        tryCatch(
-            expr ={
-                out <- get_colors(input$path) %>%
-                        make_palette(input$slider)
-                print(out)
-                },
-            error = function(e){
-                    out <- get_colors(default) %>%
-                        make_palette(input$slider)
-                    message('An example')
-                    print(out)
-            },
-            warning = function(w){
-                message('Caught a warning!')
-                print(w)
-            },
-            finally = {
-                message('Plot done, quitting.')
-            }
-        )
+        out <- get_colors(input$path) %>%
+            make_palette(input$slider)
+        print(out)
 
     })
     output$code <- renderPrint({
-        tryCatch(
-            expr ={
-                out <- get_colors(input$path) %>%
-                    make_palette(input$slider)
-                print(out)
-            },
-            error = function(e){
-                
-                out <- get_colors(default) %>%
-                    make_palette(input$slider)
-                message('An example')
-                print(out)
-            },
-            warning = function(w){
-                message('Caught a warning!')
-                print(w)
-            },
-            finally = {
-
-                message('Color codes printed, quitting.')
-            }
-        )
+        
+        out <- get_colors(input$path) %>%
+            make_palette(input$slider)
+        print(out)
         
     })
     output$source<- renderPlot ({
-
-        tryCatch(
-            expr ={
-
-                img <- magick::image_read(input$path)
-                plot(img)
-            },
-            error = function(e){
-                img <- magick::image_read(default)
-                plot(img)
-                message('An example')
-                print(e)
-            },
-            warning = function(w){
-
-            },
-            finally = {
-                
-                # Return a list
-                list(src = img,
-                     alt = "Color palette source")
-            }
-        )
         
-    }
-    )
+        img <- magick::image_read(input$path)
+        plot(img)
+
+    })
 }
 # Run the application 
 shinyApp(ui = ui, server = server)
