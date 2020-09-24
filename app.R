@@ -19,7 +19,7 @@ data <- c(
 
 # Pick an example from the image dataset
 default <- sample(data,1)
-
+#The svg files are not properly rendered at the moment.
 # Define UI for application 
 
 ui <- fluidPage(
@@ -53,21 +53,17 @@ server <- function(input, output, session) {
     # Ensure reproducibility
     set.seed(123)
     
-    datasetInput <- reactive({
-        
-        get_colors(input$path) %>%
-                   make_palette(input$slider)
-        
-    })
     
     output$palette <- renderPlot({
 
-        out <- datasetInput()
+        out <- get_colors(input$path) %>%
+            make_palette(input$slider)
 
     })
     output$code <- renderPrint({
         
-        out <- datasetInput()
+        out <- get_colors(input$path) %>%
+            make_palette(input$slider)
         print(out)
         
     })
@@ -80,3 +76,4 @@ server <- function(input, output, session) {
 }
 # Run the application 
 shinyApp(ui = ui, server = server)
+
