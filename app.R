@@ -36,7 +36,8 @@ ui <- fluidPage(
             # a text input box
             textInput(inputId = "path", label = "Paste image URL below:", value = default),
             #a slider to choose number of colors in the palette                                                        
-            sliderInput("slider", label = "How many colors would you like?",min = 1, max = 10, value = 5)
+            sliderInput("slider", label = "How many colors would you like?",min = 1, max = 10, value = 5),
+            actionButton("goButton", "Go!")
         ),
         mainPanel(
             
@@ -51,28 +52,31 @@ ui <- fluidPage(
 server <- function(input, output, session) {
     
     # Ensure reproducibility
-    set.seed(123)    
+    set.seed(123)
+    
     
     output$palette <- renderPlot({
-
-        get_colors(input$path) %>%
-            make_palette(input$slider)
+        
+        input$goButton
+        out <- get_colors(isolate(input$path)) %>%
+            make_palette(isolate(input$slider))
 
     })
     output$code <- renderPrint({
         
-        out <- get_colors(input$path) %>%
-            make_palette(input$slider)
+        input$goButton
+        out <- get_colors(isolate(input$path)) %>%
+            make_palette(isolate(input$slider))
         print(out)
         
     })
     output$source<- renderPlot ({
         
-        img <- magick::image_read(input$path)
+        input$goButton
+        img <- magick::image_read(isolate(input$path))
         plot(img)
 
     })
 }
 # Run the application 
 shinyApp(ui = ui, server = server)
-
